@@ -6,25 +6,32 @@ import Loader from "./components/Loader/Loader";
 import ImageModal from "./components/ImageModal/ImageModal";
 import { requestPicturesBySearchValue } from "./services/api";
 import ErrorMessage from "./components/ErrorMessage/ErrorMessage";
+import { Image, Response } from "./types";
 
-const App = () => {
-  const [modalIsOpen, setIsOpen] = useState({
+interface ModalState {
+  isOpen: boolean;
+  imgUrl: string;
+  imgAlt: string;
+}
+
+function App() {
+  const [modalIsOpen, setIsOpen] = useState<ModalState>({
     isOpen: false,
     imgUrl: "",
     imgAlt: "",
   });
-  const [images, setImages] = useState([]);
-  const [error, setError] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [searchTerm, setSearchTerm] = useState(null);
-  const [page, setPage] = useState(1);
-  const [pagination, setPagination] = useState(false);
-  const [noResults, setNoResults] = useState(false);
+  const [images, setImages] = useState<Image[]>([]);
+  const [error, setError] = useState<null | string>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [page, setPage] = useState<number>(1);
+  const [pagination, setPagination] = useState<boolean>(false);
+  const [noResults, setNoResults] = useState<boolean>(false);
 
-  const galleryRef = useRef(null);
-  const [prevScrollHeight, setPrevScrollHeight] = useState(0);
+  const galleryRef = useRef<HTMLDivElement | null>(null);
+  const [prevScrollHeight, setPrevScrollHeight] = useState<number>(0);
 
-  const handleSubmit = (searchTerm) => {
+  const handleSubmit = (searchTerm: string): void => {
     setSearchTerm(searchTerm);
     setPage(1);
     setImages([]);
@@ -32,13 +39,13 @@ const App = () => {
 
   useEffect(() => {
     if (!searchTerm) return;
+
     const fetchImages = async () => {
       try {
         setIsLoading(true);
-        const { results, total_pages } = await requestPicturesBySearchValue(
-          searchTerm,
-          page
-        );
+        const { results, total_pages }: Response =
+          await requestPicturesBySearchValue(searchTerm, page);
+
         if (results.length === 0 && page === 1) {
           setNoResults(true);
         } else {
@@ -49,11 +56,16 @@ const App = () => {
           setNoResults(false);
         }
       } catch (err) {
-        setError(err.message);
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError("An unknown error occurred");
+        }
       } finally {
         setIsLoading(false);
       }
     };
+
     fetchImages();
   }, [searchTerm, page]);
 
@@ -67,14 +79,14 @@ const App = () => {
     }
   }, [images, prevScrollHeight]);
 
-  const handleLoadMore = () => {
+  const handleLoadMore = (): void => {
     if (galleryRef.current) {
       setPrevScrollHeight(galleryRef.current.scrollHeight);
     }
     setPage((prevPage) => prevPage + 1);
   };
 
-  const openModal = (url, alt) => {
+  const openModal = (url: string, alt: string): void => {
     setIsOpen({
       ...modalIsOpen,
       isOpen: true,
@@ -83,7 +95,7 @@ const App = () => {
     });
   };
 
-  const closeModal = () => {
+  const closeModal = (): void => {
     setIsOpen({ ...modalIsOpen, isOpen: false, imgUrl: "", imgAlt: "Image" });
   };
 
@@ -97,13 +109,12 @@ const App = () => {
       )}
       {error !== null && <ErrorMessage error={error} />}
       <div ref={galleryRef} className="imageList">
-        {" "}
         {images.length > 0 && (
           <ImageGallery images={images} openModal={openModal} />
         )}
       </div>
       {pagination && <LoadMoreBtn onClick={handleLoadMore} />}
-      {isLoading === true && <Loader />}
+      {isLoading && <Loader />}
       <ImageModal
         isOpen={modalIsOpen.isOpen}
         imgUrl={modalIsOpen.imgUrl}
@@ -112,6 +123,6 @@ const App = () => {
       />
     </div>
   );
-};
+}
 
 export default App;

@@ -1,7 +1,20 @@
 import ReactModal from "react-modal";
+
+type ImageModalProps = {
+  isOpen: boolean;
+  closeModal: () => void;
+  imgUrl: string;
+  imgAlt: string;
+};
+
 ReactModal.setAppElement("#root");
 
-const ImageModal = ({ isOpen, closeModal, imgUrl, imgAlt }) => {
+const ImageModal = ({
+  isOpen,
+  closeModal,
+  imgUrl,
+  imgAlt,
+}: ImageModalProps) => {
   const customStyles = {
     content: {
       maxWidth: "50%",
@@ -16,6 +29,7 @@ const ImageModal = ({ isOpen, closeModal, imgUrl, imgAlt }) => {
       backgroundColor: "rgba(0, 0, 0, 0.75)",
     },
   };
+
   return (
     <ReactModal
       isOpen={isOpen}
