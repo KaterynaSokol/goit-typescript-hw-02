@@ -1,0 +1,12 @@
+.errorWrapper {
+  width: 400px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: rgba(39, 110, 168, 0.4);
+  border: none;
+  border-radius: 3px;
+}
+.errorText {
+  color: white;
+  font-weight: bold;
+}

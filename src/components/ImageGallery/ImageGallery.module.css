@@ -1,0 +1,13 @@
+.imageList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  max-width: 1240px;
+  margin: 0 auto;
+}
+
+.imageItem {
+  width: 400px;
+  height: 267px;
+  border-radius: 8px;
+}
